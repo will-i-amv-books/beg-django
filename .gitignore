@@ -68,3 +68,6 @@ target/
 
 #IDE-related config files
 .vscode
+
+#SQLite files
+*.sqlite3
