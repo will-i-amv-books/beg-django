@@ -1,6 +1,5 @@
 # Pytest files and test output files
 .xprocess/
-/*.txt
 /*.log
 /*.json
 
