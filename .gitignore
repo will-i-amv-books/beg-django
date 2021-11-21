@@ -71,3 +71,6 @@ target/
 
 #SQLite files
 *.sqlite3
+
+# Env variables
+.env
