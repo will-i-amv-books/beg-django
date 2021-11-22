@@ -26,7 +26,8 @@ urlpatterns = [
     url(r'^about/$',TemplateView.as_view(template_name='about.html')),
     url(
         r'^drinks/(?P<drink_name>\D+)/', 
-        TemplateView.as_view(template_name='drinks/index.html')
+        TemplateView.as_view(template_name='drinks/index.html'),
+        {'onsale':True},
     ),
     url(r'^$',TemplateView.as_view(template_name='homepage.html')),
 ]
