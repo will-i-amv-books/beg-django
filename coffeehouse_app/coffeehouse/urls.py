@@ -22,6 +22,7 @@ from coffeehouse.about import views as about_views
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^about/index/',TemplateView.as_view(template_name='index.html')),
     url(r'^about/', about_views.contact),
     url(r'^$',TemplateView.as_view(template_name='homepage.html')),
 ]
