@@ -24,5 +24,9 @@ urlpatterns = [
     url(r'^admin/$', admin.site.urls),
     url(r'^about/index/$',TemplateView.as_view(template_name='index.html')),
     url(r'^about/$',TemplateView.as_view(template_name='about.html')),
+    url(
+        r'^drinks/(?P<drink_name>\D+)/', 
+        TemplateView.as_view(template_name='drinks/index.html')
+    ),
     url(r'^$',TemplateView.as_view(template_name='homepage.html')),
 ]
