@@ -20,18 +20,25 @@ from coffeehouse.about import views as about_views
 from coffeehouse.stores import views as stores_views
 
 
+store_patterns = [
+    url(r'^(?P<store_id>\d+)/$', stores_views.detail), 
+    url(r'^$', stores_views.index), 
+]
+
+about_patterns = [
+    url(r'^contact/$', about_views.contact), 
+    url(r'^$', about_views.index), 
+]
+
 urlpatterns = [
     url(r'^admin/doc/$', include('django.contrib.admindocs.urls')),
     url(r'^admin/$', admin.site.urls),
-    url(r'^about/contact/',about_views.contact),
-    url(r'^about/index/$', TemplateView.as_view(template_name='index.html')),
-    url(r'^about/$', TemplateView.as_view(template_name='about.html')),
+    url(r'^about/', include(about_patterns)), 
+    url(r'^stores/', include(store_patterns), {'location':'headquarters'}), 
     url(
         r'^drinks/(?P<drink_name>\D+)/', 
         TemplateView.as_view(template_name='drinks/index.html'),
         {'onsale':True},
     ),
     url(r'^$', TemplateView.as_view(template_name='homepage.html')),
-    url(r'^stores/(?P<store_id>\d+)/', stores_views.detail),
-    url(r'^stores/', stores_views.detail, {'location':'headquarters'}),
 ]
