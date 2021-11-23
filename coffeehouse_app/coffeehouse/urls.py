@@ -39,6 +39,7 @@ urlpatterns = [
         r'^drinks/(?P<drink_name>\D+)/', 
         TemplateView.as_view(template_name='drinks/index.html'),
         {'onsale':True},
+        name="drink",
     ),
     url(r'^$', TemplateView.as_view(template_name='homepage.html'), name="homepage")
 ]
