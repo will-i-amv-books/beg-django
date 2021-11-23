@@ -16,25 +16,13 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
-from coffeehouse.about import views as about_views
-from coffeehouse.stores import views as stores_views
 
-
-store_patterns = [
-    url(r'^(?P<store_id>\d+)/$', stores_views.detail, name="detail"), 
-    url(r'^$', stores_views.index, name="index"), 
-]
-
-about_patterns = [
-    url(r'^contact/$', about_views.contact, name="contact"), 
-    url(r'^$', about_views.index, name="index"), 
-]
 
 urlpatterns = [
     url(r'^admin/doc/$', include('django.contrib.admindocs.urls')),
     url(r'^admin/$', admin.site.urls),
-    url(r'^about/', include(about_patterns, namespace="about")), 
-    url(r'^stores/', include(store_patterns, namespace="stores"), {'location':'headquarters'}), 
+    url(r'^about/', include('coffeehouse.about.urls', namespace="about")), 
+    url(r'^stores/', include('coffeehouse.stores.urls', namespace="stores"), {'location':'headquarters'}), 
     url(
         r'^drinks/(?P<drink_name>\D+)/', 
         TemplateView.as_view(template_name='drinks/index.html'),

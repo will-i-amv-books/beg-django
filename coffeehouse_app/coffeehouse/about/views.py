@@ -6,4 +6,4 @@ from django.core.urlresolvers import reverse
 def contact(request):
     # Content from request or database extracted here
     # and passed to the template for display
-    return HttpResponsePermanentRedirect(reverse('about:contact'))
+    return HttpResponsePermanentRedirect(reverse('stores:about:index'))
