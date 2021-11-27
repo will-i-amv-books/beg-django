@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-from django.shortcuts import render
 from coffeehouse.stores.views import STORE_LIST
-from django.http import Http404
-from django.views.generic import View
-from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.generic import View
+from django.http import HttpResponse, Http404
 
-def index(request,store_id=None):
+
+def index(request, store_id=None):
     # Create fixed data structures to pass to template
     # data could equally come from database queries
     if store_id == None:
@@ -21,13 +19,14 @@ def index(request,store_id=None):
         store = STORE_LIST[3]
     else:
         raise Http404
-    return render(request,'about/index.html',{'store':store})
+    return render(request, 'about/index.html', {'store':store})
+
 
 class ContactPage(View):
     mytemplate = 'about/contact.html'
     unsupported = 'Unsupported operation'
     
-    def get(self, request,store_id=None):
+    def get(self,  request, store_id=None):
         # Create fixed data structures to pass to template
         # data could equally come from database queries
         if store_id == None:
@@ -40,7 +39,7 @@ class ContactPage(View):
             store = STORE_LIST[3]
         else:
             raise Http404        
-        return render(request, self.mytemplate,{'store':store})
+        return render(request,  self.mytemplate, {'store':store})
 
-    def post(self, request):
+    def post(self,  request):
         return HttpResponse(self.unsupported)
