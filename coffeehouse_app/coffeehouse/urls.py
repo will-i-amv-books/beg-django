@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
+from coffeehouse.drinks.urls import urlpatterns as drinks_url_patterns
 
 
 # Overrides the default 400 handler django.views.defaults.bad_request
@@ -32,9 +33,9 @@ urlpatterns = [
     url(r'^admin/',  admin.site.urls), 
     url(r'^about/', include('coffeehouse.about.urls', namespace="about")), 
     url(r'^stores/', include('coffeehouse.stores.urls', namespace="stores")), 
+    url(r'^drinks/', include(drinks_url_patterns, namespace="drinks")),
     url(r'^coffeebanners/', include('coffeehouse.banners.urls', namespace="coffee-banners", app_name="banners_adverts")), 
     url(r'^teabanners/', include('coffeehouse.banners.urls', namespace="tea-banners", app_name="banners_adverts")), 
     url(r'^foodbanners/', include('coffeehouse.banners.urls', namespace="food-banners", app_name="banners_adverts")), 
-    url(r'^drinks/(?P<drink_type>\D+)/', TemplateView.as_view(template_name='drinks/index.html'), {'onsale':True}, name="drink_type"), 
     url(r'^$', TemplateView.as_view(template_name='homepage.html'), name="homepage"), 
 ]
