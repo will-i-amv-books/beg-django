@@ -29,14 +29,14 @@ handler404 = 'coffeehouse.utils.views.page_not_found'
 handler500 = 'coffeehouse.utils.views.server_error'
     
 urlpatterns = [
-    url(r'^admin/doc/',  include('django.contrib.admindocs.urls')), 
-    url(r'^admin/',  admin.site.urls), 
     url(r'^about/', include('coffeehouse.about.urls', namespace="about")), 
+    url(r'^drinks/', include(drinks_url_patterns, namespace="drinks")), 
     url(r'^stores/', include('coffeehouse.stores.urls', namespace="stores")), 
-    url(r'^drinks/', include(drinks_url_patterns, namespace="drinks")),
+    url(r'^online/', TemplateView.as_view(template_name='online/index.html'), name='online'), 
     url(r'^coffeebanners/', include('coffeehouse.banners.urls', namespace="coffee-banners", app_name="banners_adverts")), 
-    url(r'^online/',TemplateView.as_view(template_name='online/index.html'),name='online'),
     url(r'^teabanners/', include('coffeehouse.banners.urls', namespace="tea-banners", app_name="banners_adverts")), 
     url(r'^foodbanners/', include('coffeehouse.banners.urls', namespace="food-banners", app_name="banners_adverts")), 
+    url(r'^admin/doc/',  include('django.contrib.admindocs.urls')), 
+    url(r'^admin/',  admin.site.urls), 
     url(r'^$', TemplateView.as_view(template_name='homepage.html'), name="homepage"), 
 ]

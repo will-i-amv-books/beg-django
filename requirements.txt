@@ -2,3 +2,5 @@ Django==1.10
 psycopg2-binary
 python-dotenv
 docutils
+Jinja2
+jinja2-django-tags
