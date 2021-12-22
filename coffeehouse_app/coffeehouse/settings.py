@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 import os
 from dotenv import load_dotenv
+import socket
 
 
 load_dotenv()
@@ -19,8 +20,17 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+# If the host name starts with 'li', set LIVEHOST = True
+if socket.gethostname().startswith('li'):
+    LIVEHOST = True
+else:
+    LIVEHOST = False
+
+# Define general behavior variables for live host and non-live host
+if LIVEHOST:
+    DEBUG = False
+else:
+    DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^9ze(b)@e20a-c!cferimw+h0+=bva0g4k=l3w(_ed00am@yio'
@@ -33,6 +43,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
+    'django_pdb',
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.auth',
@@ -40,9 +52,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'coffeehouse.about',
     'coffeehouse.stores',
     'coffeehouse.drinks',
+    'raven.contrib.django.raven_compat',
 )
 
 MIDDLEWARE = [
@@ -51,26 +65,15 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'coffeehouse.utils.middleware.CoffeehouseMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'coffeehouse.urls'
 
 TEMPLATES = [
-    { 
-        'BACKEND':'django.template.backends.jinja2.Jinja2',
-        'DIRS': ['%s/templates/'% (PROJECT_DIR),],
-        'APP_DIRS': True,
-        'OPTIONS': { 
-            'extensions': [
-                'jdj_tags.extensions.DjangoCompat',
-                'coffeehouse.jinja.extensions.DjangoNow'
-                ],
-            'environment': 'coffeehouse.jinja.env.JinjaEnvironment'
-        }
-    },
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': ['%s/templates/'% (PROJECT_DIR),],
@@ -92,7 +95,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'coffeehouse.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -126,6 +128,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Email
+
+ADMINS =(('Webmaster', 'webmaster@coffeehouse.com'), ('Admin', 'admin@coffeehouse.com'))
+
+if LIVEHOST:
+    # Output to file based SMTP server on live host 
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = '/tmp/django-project-messages'
+
+else: 
+    # Output to console for non live host
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -140,10 +154,29 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+INTERNAL_IPS = ('127.0.0.1')
+STATIC_ROOT = '%s/coffeestatic/'% (BASE_DIR)
+STATICFILES_DIRS = ('%s/website-static-default/'% (BASE_DIR),
+                    ('bootstrap','%s/bootstrap-3.1.1-dist/'% (BASE_DIR)),
+                    ('jquery','%s/jquery-1-11-1-dist/'% (BASE_DIR)),
+                    ('jquery-ui','%s/jquery-ui-1.10.4/'% (BASE_DIR)),)
+
+# Logging
+
+RAVEN_CONFIG = {
+    'dsn': 'https://<place_your_project_dsn_here>:<place_your_project_dsn_here>@sentry.io/151850',
+    # If you are using git, you can also automatically configure the
+    # release based on the git info.
+    #'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+}
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['sentry'],
+    },    
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
@@ -152,41 +185,61 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s %(message)s',
+	    'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+	    'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         },
-        'null': {
-            'class': 'logging.NullHandler',
+        'sentry': {
+            'level': 'DEBUG',
+            'class': 'raven.contrib.django.handlers.SentryHandler',
         },
-        'mail_admins': {
+        'development_logfile': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_dev.log',
+            'formatter': 'verbose'
+        },
+        'production_logfile': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_production.log',
+            'formatter': 'simple'
+        },
+        'dba_logfile': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true','require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_dba.log',
+            'formatter': 'simple'
+        },
     },
     'loggers': {
+        'coffeehouse': {
+            'handlers': ['console','development_logfile','production_logfile'],
+         },
+        'dba': {
+            'handlers': ['console','dba_logfile'],
+        },
         'django': {
-            'handlers': ['console'],
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
+            'handlers': ['console','development_logfile','production_logfile'],
         },
         'py.warnings': {
-            'handlers': ['console'],
+            'handlers': ['console','development_logfile'],
         },
-        'coffeehouse': {
-            'handlers': ['console'],
-            'level': 'INFO',            
-        },        
     }
 }

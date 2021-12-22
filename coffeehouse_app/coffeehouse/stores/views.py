@@ -1,11 +1,16 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-import logging
+# Create your views here.
 from django.shortcuts import render
-from django.core.exceptions import SuspiciousOperation
-from django.http import Http404, HttpResponsePermanentRedirect
-from django.template.response import TemplateResponse
+from django.http import Http404
+import logging
 
+
+# Standard instance of a logger with __name__
+stdlogger = logging.getLogger(__name__)
+stdlogger.setLevel(logging.DEBUG)
+
+# Custom instance logging with explicit name
+dbalogger = logging.getLogger('dba')
+dbalogger.setLevel(logging.DEBUG)
 
 STORE_LIST =  [
     {
@@ -41,52 +46,16 @@ STORE_LIST =  [
         'email': 'midtown@coffeehouse.com'
     }
 ]
-stdlogger = logging.getLogger(__name__)
 
-
-def index(request, location=None):
-    stdlogger.info("Start stores index")
+def index(request):
+    stdlogger.debug("Call to index method")
     store_list = STORE_LIST[1:]
-    stdlogger.info("End stores index")
-    t = TemplateResponse(request, 'stores/index.html', {'stores':store_list})
-    return t
+    return render(request,'stores/index.html',  {'stores':store_list})
 
 
-def detail(request, store_id=1, location=None):
-    # Access store_id parameter with 'store_id' variable 
-    # Access location parameter with 'location' variable
-    # Extract 'hours', 'lat' or 'lon' values appended to url as
-    # e.g. ?hours=sunday&latitude=32.71&longitude=-117.16
-    # 'hours' has value 'sunday' or '' if hours not in url
-    # 'latitude' has value 32.71 or 0 if latitude not in url
-    # 'longitude' has value -117.16 or 0 if longitude not in url
-    hours = request.GET.get('hours', '')
-    latitude = request.GET.get('latitude', 0)
-    longitude = request.GET.get('longitude', 0)    
-    # Validation for hours variables
-    if hours not in ['', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']:
-        raise Http404
-    
-    # Validation for latitude & longitude 
-    try:
-        # latitude and longitude should be cast'able to float if numbers
-        float(latitude)
-        float(longitude)
-    except ValueError:
-        raise SuspiciousOperation
-    
-    # Validation if latitude in range
-    if float(latitude) > 90 or float(latitude) < -90:
-        raise Exception("Invalid latitude, min -90 and max 90")
-    # Validation if longitude in range
-    if float(longitude) > 180 or float(longitude) < -180:
-        raise Exception("Invalid longitude, min -180 and max 180")
-    # If latitude==90 and longitude==90, redirect to maps.google.com
-    if float(latitude) == 90 or float(longitude) == 90:
-        return HttpResponsePermanentRedirect("http://maps.google.com/")
-    
-    # Create fixed data structures to pass to template
-    # data could equally come from database queries
+def detail(request,store_id=1):
+    stdlogger.info("Call to detail method")
+    stdlogger.debug("Entering store_id conditional block with store_id=%s" % store_id)
     if store_id == "1":
         store = STORE_LIST[1]
     elif store_id == "2":
@@ -95,7 +64,16 @@ def detail(request, store_id=1, location=None):
         store = STORE_LIST[3]
     else:
         raise Http404
-    store_amenities = ['WiFi', 'A/C']
-    store_menu = ((0, ''), (1, 'Drinks'), (2, 'Food'))
-    vals_for_template = {'store':store, 'store_amenities':store_amenities, 'store_menu':store_menu}
-    return render(request, 'stores/detail.html', vals_for_template)
+        stdlogger.debug("Could not match store_id=%s" % store_id)
+    store_amenities = ['WiFi','A/C']
+    store_menu = ((0,''),(1,'Drinks'),(2,'Food'))
+    vals_for_template = {'store':store,'store_amenities':store_amenities,'store_menu':store_menu}
+    # Boilerplate try/except block with logging
+    try: 
+        stdlogger.info("About to search db")
+        # Loging to search db 
+    except Exception as e:
+        stdlogger.error("Error in searchdb method")
+        dbalogger.error("Error in searchdb method, stack %s" % (e))
+    return render(request,'stores/detail.html', vals_for_template)
+
