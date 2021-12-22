@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 import os
 from dotenv import load_dotenv
+import socket
 
 
 load_dotenv()
@@ -19,8 +20,17 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+# If the host name starts with 'li', set LIVEHOST = True
+if socket.gethostname().startswith('li'):
+    LIVEHOST = True
+else:
+    LIVEHOST = False
+
+# Define general behavior variables for live host and non-live host
+if LIVEHOST:
+    DEBUG = False
+else:
+    DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^9ze(b)@e20a-c!cferimw+h0+=bva0g4k=l3w(_ed00am@yio'
