@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'coffeehouse.about',
     'coffeehouse.stores',
     'coffeehouse.drinks',
+    'raven.contrib.django.raven_compat',
 )
 
 MIDDLEWARE = [
@@ -170,9 +171,22 @@ STATICFILES_DIRS = ('%s/website-static-default/'% (BASE_DIR),
                     ('jquery','%s/jquery-1-11-1-dist/'% (BASE_DIR)),
                     ('jquery-ui','%s/jquery-ui-1.10.4/'% (BASE_DIR)),)
 
+# Logging
+
+RAVEN_CONFIG = {
+    'dsn': 'https://<place_your_project_dsn_here>:<place_your_project_dsn_here>@sentry.io/151850',
+    # If you are using git, you can also automatically configure the
+    # release based on the git info.
+    #'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+}
+
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['sentry'],
+    },    
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
@@ -181,41 +195,61 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s %(message)s',
+	    'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+	    'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         },
-        'null': {
-            'class': 'logging.NullHandler',
+        'sentry': {
+            'level': 'DEBUG',
+            'class': 'raven.contrib.django.handlers.SentryHandler',
         },
-        'mail_admins': {
+        'development_logfile': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_dev.log',
+            'formatter': 'verbose'
+        },
+        'production_logfile': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_production.log',
+            'formatter': 'simple'
+        },
+        'dba_logfile': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true','require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_dba.log',
+            'formatter': 'simple'
+        },
     },
     'loggers': {
+        'coffeehouse': {
+            'handlers': ['console','development_logfile','production_logfile'],
+         },
+        'dba': {
+            'handlers': ['console','dba_logfile'],
+        },
         'django': {
-            'handlers': ['console'],
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
+            'handlers': ['console','development_logfile','production_logfile'],
         },
         'py.warnings': {
-            'handlers': ['console'],
+            'handlers': ['console','development_logfile'],
         },
-        'coffeehouse': {
-            'handlers': ['console'],
-            'level': 'INFO',            
-        },        
     }
 }
