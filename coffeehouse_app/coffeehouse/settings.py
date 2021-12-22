@@ -105,6 +105,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'coffeehouse.wsgi.application'
 
+# Static Assets
+
+STATIC_URL = '/static/'
+INTERNAL_IPS = ('127.0.0.1')
+STATIC_ROOT = '%s/coffeestatic/'% (BASE_DIR)
+STATICFILES_DIRS = ('%s/website-static-default/'% (BASE_DIR),
+                    ('bootstrap','%s/bootstrap-3.1.1-dist/'% (BASE_DIR)),
+                    ('jquery','%s/jquery-1-11-1-dist/'% (BASE_DIR)),
+                    ('jquery-ui','%s/jquery-ui-1.10.4/'% (BASE_DIR)),)
+
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
