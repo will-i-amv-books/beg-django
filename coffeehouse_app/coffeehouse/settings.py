@@ -137,6 +137,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Email
+
+ADMINS =(('Webmaster', 'webmaster@coffeehouse.com'), ('Admin', 'admin@coffeehouse.com'))
+
+if LIVEHOST:
+    # Output to file based SMTP server on live host 
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = '/tmp/django-project-messages'
+
+else: 
+    # Output to console for non live host
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
