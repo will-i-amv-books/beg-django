@@ -43,6 +43,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
+    'django_pdb',
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.auth',
