@@ -74,18 +74,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'coffeehouse.urls'
 
 TEMPLATES = [
-    { 
-        'BACKEND':'django.template.backends.jinja2.Jinja2',
-        'DIRS': ['%s/templates/'% (PROJECT_DIR),],
-        'APP_DIRS': True,
-        'OPTIONS': { 
-            'extensions': [
-                'jdj_tags.extensions.DjangoCompat',
-                'coffeehouse.jinja.extensions.DjangoNow'
-                ],
-            'environment': 'coffeehouse.jinja.env.JinjaEnvironment'
-        }
-    },
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': ['%s/templates/'% (PROJECT_DIR),],
