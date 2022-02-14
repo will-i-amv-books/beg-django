@@ -3,6 +3,7 @@ from coffeehouse.drinks.forms import DrinkForm,BaseDrinkFormSet
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 
+
 # Create your views here.
 def index(request):
     extra_forms = 2
