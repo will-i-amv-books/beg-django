@@ -13,8 +13,10 @@
 <p>{{store.address}}</p>
 <p>{{store.city}},{{store.state}}</p>
 <hr/>
-<p>We offer: {{store_amenities.0}} and {{store_amenities.1}}</p> 
-<p>Menu includes : {{store_menu.1.1}} and {{store_menu.2.1}}</p> 
+<p>We offer: </p>
+<ul>
+{% for amenity in store.amenities.all %}<li>{{amenity.name}}.- {{amenity.description}}</li>{% endfor %}
+</ul>
 
 <h4>Feedback</h4>
 <div class="row">

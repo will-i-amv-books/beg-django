@@ -47,7 +47,6 @@ class ContactForm(forms.Form):
             # Finally update the kwargs initial reference
             kwargs.update(initial=updated_initial)
             super(ContactForm, self).__init__(*args, **kwargs)
-      
       def clean(self):
             # Call clean() method to ensure base class validation
             super(ContactForm, self).clean()
@@ -63,7 +62,6 @@ class ContactForm(forms.Form):
                   #self.add_error('email', forms.ValidationError(message))
                   self.add_error(None, message)
                   #raise forms.ValidationError("Please provide an email that contains your name, or viceversa")            
-      
       def clean_name(self):
             # Get the field value from cleaned_data dict
             value = self.cleaned_data['name']
@@ -73,7 +71,6 @@ class ContactForm(forms.Form):
                   raise forms.ValidationError("Please don't use all upper case for your name, use lower case",code='uppercase')
             # Always return value 
             return value
-      
       def clean_email(self):
       	    # Get the field value from cleaned_data dict
             value = self.cleaned_data['email']

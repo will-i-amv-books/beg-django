@@ -1,25 +1,19 @@
-# Django settings for coffeehouse project.
+#Django settings for coffeehouse project.
 
 import os
-from dotenv import load_dotenv
-import socket
 
-
-load_dotenv()
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-SECRET_KEY = '%ea)cjy@v9(#7!b#(#20gl+4-6iur28dy=tc4f$-zbm-v#=!#t'
+SECRET_KEY = '29uvs3o=i7$otl4=t2&&kkwvzm47=@i5&r0a@aawggrw@@b2e('
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.admindocs',
+    'django.contrib.admindocs',    
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -27,11 +21,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'coffeehouse.about',
     'coffeehouse.stores',
-    'coffeehouse.drinks',
-    'django.forms',
-)
-
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+    'coffeehouse.items.apps.ItemsConfig',    
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,11 +43,10 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                               'coffeehouse.stores.processors.onsale',
-                               'django.template.context_processors.debug',
-                               'django.template.context_processors.request',
-                               'django.contrib.auth.context_processors.auth',
-                               'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -66,15 +56,16 @@ WSGI_APPLICATION = 'coffeehouse.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'coffehouse',
-        'USER': os.getenv('POSTGRES_USR'), 
-        'PASSWORD': os.getenv('POSTGRES_PASSWD'), 
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'devops': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'devops.sqlite3'),
+    }    
 }
 
+DATABASE_ROUTERS = ['coffeehouse.common.routers.DatabaseForDevOps']
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -104,4 +95,24 @@ STATIC_URL = '/static/'
 
 INTERNAL_IPS = ('127.0.0.1')
 
-MEDIA_ROOT = '%s/userfiles/'% (BASE_DIR)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['console'],
+    },
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s %(message)s',
+	    'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    }
+}

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-
 def onsale(request):
     # Create fixed data structures to pass to template
     # data could equally come from database queries
